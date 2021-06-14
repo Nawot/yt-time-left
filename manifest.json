@@ -35,8 +35,8 @@
     "content_scripts":
     [
         {
-            "matches": ["https://www.youtube.com/*"],
-            "js": ["index.js"],
+            "matches": ["https://www.youtube.com/watch*"],
+            "js": ["yt-time-left.js"],
             "run_at": "document_end"
         }
     ]
