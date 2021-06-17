@@ -1,9 +1,15 @@
-function init()
+async function init()
 {
-    var timeDisplay = document.getElementsByClassName('ytp-time-display')[0]
-        timeLeft    = document.getElementsByClassName('ytp-time-left')[0]
-        player      = document.getElementById('movie_player').wrappedJSObject
-        time        = new Time({})
+    defaultOptions =
+    {
+        pbr: true,
+        sb: true
+    }
+    options     = {}
+    timeDisplay = document.getElementsByClassName('ytp-time-display')[0]
+    timeLeft    = document.getElementsByClassName('ytp-time-left')[0]
+    player      = document.getElementById('movie_player').wrappedJSObject
+    time        = new Time({})
 
     if(timeLeft == null)
     {
@@ -13,11 +19,35 @@ function init()
 
         timeLeft = timeDisplay.appendChild(elem)
     }
+
+    function loadOptions()
+    {
+        function onError(error)
+        {
+            console.log(`Error: ${error}`)
+        }
+
+        function onGot(items)
+        {
+            if(items.pbr !== undefined) {options.pbr = items.pbr}
+            else {options.pbr = defaultOptions.pbr}
+
+            if(items.sb !== undefined) {options.sb = items.sb}
+            else {options.sb = defaultOptions.sb}
+        }
+        return browser.storage.local.get().then(onGot, onError)
+    }
+    await loadOptions()
+    if(options.sb) {sb = new SB()}
 }
 
 function calculateTimeLeft()
 {
-    return (player.getDuration() - player.getCurrentTime()) / player.getPlaybackRate()
+    let timeLeft
+    if(options.sb) {timeLeft = sb.getDuration() - player.getCurrentTime()}
+    else {timeLeft = player.getDuration() - player.getCurrentTime()}
+    if(options.pbr) {timeLeft /= player.getPlaybackRate()}
+    return timeLeft
 }
 
 function setTimeLeft(sec)
@@ -76,11 +106,74 @@ class Time
     getHours()   {return this.hours}
 }
 
+class SB
+{
+    constructor()
+    {
+        this._isCreated = false
+        this.fakeConstructor()
+    }
+
+    async fakeConstructor()
+    {
+        let server = 'https://sponsor.ajay.app/api/skipSegments/'
+        let videoID = player.getVideoData().video_id
+        let url = `${server}?videoID=${videoID}`
+        let response = await fetch(url)
+        response = await response.json()
+        this.segments = []
+        this.duration = player.getDuration()
+        for (let i = 0; i < response.length; i++)
+        {
+            let segment = {}
+            segment.times = response[i].segment
+            let timeSegment = response[i].segment[1] - response[i].segment[0]
+            segment.timeSegment = timeSegment
+            segment.isPassed = false
+            this.segments.push(segment)
+            this.duration -= timeSegment
+        }
+        this._isCreated = true
+    }
+
+    getDuration()
+    {
+        if(!this._isCreated) {return player.getDuration()}
+        let duration = this.duration
+        for (let i = 0; i < this.segments.length; i++)
+        {
+            let segment = this.segments[i]
+            if (player.getCurrentTime() > segment.times[1] - 1)
+            {
+                if(!segment.isPassed)
+                {
+                    duration += segment.timeSegment
+                    segment.isPassed = true
+                }
+            }
+            else
+            {
+                if(segment.isPassed)
+                {
+                    duration -= segment.timeSegment
+                    segment.isPassed = false
+                }
+            }
+        }
+        this.duration = duration
+        return duration
+    }
+}
+
 function tick()
 {
     setTimeLeft(calculateTimeLeft())
     window.requestAnimationFrame(tick)
 }
+async function main()
+{
+    await init()
+    tick()
+}
 
-init()
-tick()
+main()

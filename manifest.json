@@ -1,7 +1,7 @@
 {
     "name": "yt-time-left",
     "description": "__MSG_description__",
-    "version": "0.1",
+    "version": "0.2",
     "version_name": "Init",
     "manifest_version": 2,
 
@@ -39,6 +39,17 @@
             "js": ["yt-time-left.js"],
             "run_at": "document_end"
         }
-    ]
+    ],
 
+    "permissions":
+    [
+        "storage",
+        "https://sponsor.ajay.app/api/*",
+        "webRequest"
+    ],
+
+    "options_ui":
+    {
+        "page": "options/options.html"
+    }
 }
