@@ -165,15 +165,18 @@ class SB
     }
 }
 
-function tick()
+function tick(start)
 {
-    setTimeLeft(calculateTimeLeft())
-    window.requestAnimationFrame(tick)
+    if(player.getPlayerState() == 1 || start === true)
+    {
+        setTimeLeft(calculateTimeLeft())
+    }
+    window.requestAnimationFrame(tick)  
 }
 async function main()
 {
     await init()
-    tick()
+    tick(true)
 }
 
 main()
