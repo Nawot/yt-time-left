@@ -44,8 +44,8 @@ async function init()
 function calculateTimeLeft()
 {
     let timeLeft
-    if(options.sb) {timeLeft = sb.getDuration() - player.getCurrentTime()}
-    else {timeLeft = player.getDuration() - player.getCurrentTime()}
+    if(options.sb) {timeLeft = Math.floor(sb.getDuration()) - Math.floor(player.getCurrentTime())}
+    else {timeLeft = Math.floor(player.getDuration()) - Math.floor(player.getCurrentTime())}
     if(options.pbr) {timeLeft /= player.getPlaybackRate()}
     return timeLeft
 }
