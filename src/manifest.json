@@ -12,15 +12,15 @@
 
     "icons":
     {
-        "1024": "icons/1024.png",
-        "512": "icons/512.png",
-        "256": "icons/256.png",
-        "128": "icons/128.png",
-        "64": "icons/64.png",
-        "48": "icons/48.png",
-        "24": "icons/24.png",
-        "16": "icons/16.png",
-        "8": "icons/8.png"
+        "1024": "icons/icon.svg",
+        "512": "icons/icon.svg",
+        "256": "icons/icon.svg",
+        "128": "icons/icon.svg",
+        "64": "icons/icon.svg",
+        "48": "icons/icon.svg",
+        "24": "icons/icon.svg",
+        "16": "icons/icon.svg",
+        "8": "icons/icon.svg"
     },
 
     "applications":
